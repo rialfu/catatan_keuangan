@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
           // colorScheme: ColorScheme.fromSwatch(
           //  primarySwatch: MaterialColor(primary, swatch)
           // ),
-          primaryColor: const Color.fromARGB(255, 255, 36, 0),
+          primaryColor: Colors.white,
 
           textTheme: TextTheme(
               displayLarge: TextStyle(
