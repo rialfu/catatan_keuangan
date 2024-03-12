@@ -46,8 +46,8 @@ class _DailyPageState extends State<DailyPage> {
 
   @override
   Widget build(BuildContext context) {
-    final widthScreen = MediaQuery.of(context).size.width;
-    final heightScreen = MediaQuery.of(context).size.height;
+    final widthScreen = MediaQuery.sizeOf(context).width;
+    final heightScreen = MediaQuery.sizeOf(context).height;
     return BlocListener<DateCubit, DateTime>(
       listener: (contextDateCubit, valueDateCubit) {
         // print("first time daily page");

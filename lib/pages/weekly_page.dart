@@ -11,7 +11,6 @@ import 'package:acccountmonthly/extension/int_extension.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 class WeeklyPage extends StatefulWidget {
   const WeeklyPage({super.key});
@@ -98,8 +97,7 @@ class _WeeklyPageState extends State<WeeklyPage> {
   @override
   Widget build(BuildContext context) {
     // final widthScreen = MediaQuery.of(context).size.width;
-    final heightScreen = MediaQuery.of(context).size.height;
-    final format = DateFormat('dd.MM');
+    final heightScreen = MediaQuery.sizeOf(context).height;
     return BlocListener<DateCubit, DateTime>(
       listener: (contextDateCubit, valueDateCubit) {
         createRange(valueDateCubit);
@@ -216,7 +214,7 @@ class _WeeklyPageState extends State<WeeklyPage> {
                                       padding: const EdgeInsets.all(6),
                                       color: Colors.grey[200],
                                       child: Text(
-                                          '${format.format(week.start)} - ${format.format(week.end)}'),
+                                          '${week.start.dddotmm()} - ${week.end.dddotmm()}'),
                                     ),
                                   ],
                                 ),

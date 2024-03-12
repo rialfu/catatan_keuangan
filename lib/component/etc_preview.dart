@@ -36,7 +36,9 @@ class _ETCPreviewState extends State<ETCPreview> {
     final overlay = Overlay.of(context);
     context.read<SettingCubit>().openOverlay();
     // final renderBox= context.findRenderObject() as RenderBox;
-    final widthScreen = MediaQuery.of(context).size.width;
+    final widthScreen = MediaQuery.sizeOf(context).width;
+    //MediaQuery.of(context).size.width;
+
     overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         width: widthScreen * 0.23,
@@ -53,7 +55,7 @@ class _ETCPreviewState extends State<ETCPreview> {
 
   Widget itemList(double heightScreen, double widthScreen, Function() event,
       String text, IconData? icon) {
-    final widthScreen = MediaQuery.of(context).size.width;
+    final widthScreen = MediaQuery.sizeOf(context).width;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: event,
@@ -82,8 +84,8 @@ class _ETCPreviewState extends State<ETCPreview> {
   }
 
   Widget buildOverlay() {
-    final widthScreen = MediaQuery.of(context).size.width;
-    final heightScreen = MediaQuery.of(context).size.height;
+    final widthScreen = MediaQuery.sizeOf(context).width;
+    final heightScreen = MediaQuery.sizeOf(context).height;
     return BlocListener<SettingCubit, SettingData>(
       listener: (context, state) {
         if (state.closeOverlay) {

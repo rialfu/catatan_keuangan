@@ -2,6 +2,9 @@ import 'package:acccountmonthly/bloc/db/db_bloc.dart';
 import 'package:acccountmonthly/bloc/db/db_event.dart';
 import 'package:acccountmonthly/bloc/db/db_state.dart';
 import 'package:acccountmonthly/component/component_custom.dart';
+import 'package:acccountmonthly/component/form_date.dart';
+import 'package:acccountmonthly/component/form_money.dart';
+import 'package:acccountmonthly/component/form_type.dart';
 import 'package:acccountmonthly/data/arus_data.dart';
 import 'package:acccountmonthly/data/category_data.dart';
 import 'package:acccountmonthly/extension/datetime_extension.dart';
@@ -9,7 +12,6 @@ import 'package:acccountmonthly/extension/int_extension.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 
 class AddScreen extends StatefulWidget {
   final String type;
@@ -23,10 +25,11 @@ class AddScreen extends StatefulWidget {
 class _AddScreenState extends State<AddScreen> {
   DateTime? dateData;
   final formKey = GlobalKey<FormState>();
-  final moneyController = TextEditingController(text: '0');
+  // final moneyController = TextEditingController(text: '0');
   final detailController = TextEditingController();
   // DateTime? dateData;
   String? type;
+  int money = 0;
   bool? isIncome;
   int? defaultValueIn;
   int? defaultValueOut;
@@ -36,7 +39,6 @@ class _AddScreenState extends State<AddScreen> {
     super.initState();
 
     if (widget.type == "edit" && widget.data != null) {
-      moneyController.text = widget.data!.money.moneyFormat();
       detailController.text = widget.data!.description;
 
       final state = context.read<DBBloc>().state;
@@ -68,34 +70,24 @@ class _AddScreenState extends State<AddScreen> {
     }
   }
 
-  // void confirmationDialog(String title, String message, Function() event) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) => CupertinoAlertDialog(
-  //       title: Text(title),
-  //       content: Text(message),
-  //       actions: [
-  //         CupertinoDialogAction(
-  //           // isDefaultAction: true,
-  //           onPressed: event,
-  //           child: const Text("Yes"),
-  //         ),
-  //         CupertinoDialogAction(
-  //           onPressed: () {
-  //             Navigator.of(context).pop();
-  //           },
-  //           child: const Text("No"),
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
+  @override
+  void dispose() {
+    detailController.dispose();
+    super.dispose();
+  }
 
   String? initialValueType() {
     if (widget.type == "edit") {
       return widget.data!.type;
     }
     return null;
+  }
+
+  String initialValueMoney() {
+    if (widget.type == 'edit') {
+      return widget.data!.money.moneyFormat();
+    }
+    return '0.00';
   }
 
   DateTime? initialValueDate() {
@@ -124,6 +116,8 @@ class _AddScreenState extends State<AddScreen> {
         return;
       }
       formKey.currentState!.save();
+
+      // return;
       print('send1');
       try {
         final tanggal = dateData!.yyyymmdd();
@@ -133,8 +127,6 @@ class _AddScreenState extends State<AddScreen> {
           bloc.add(FirstTime2());
           return;
         }
-        double money =
-            double.parse(moneyController.text.replaceAll(RegExp(r'[\,]'), ''));
         Map<String, Object> data = {
           "datenote": tanggal,
           "description": detailController.text,
@@ -142,6 +134,8 @@ class _AddScreenState extends State<AddScreen> {
           'money': money,
           'id_category': (isIncome!) ? defaultValueIn! : defaultValueOut!,
         };
+        // print(data);
+        // return;
         ComponentCustom.confirmationDialog("Confirmation",
             'Are you sure want ${widget.type == "edit" ? "update" : "add"} this data?',
             () {
@@ -165,104 +159,6 @@ class _AddScreenState extends State<AddScreen> {
         );
       }
     }
-  }
-
-  Widget formDate(double heightScreen) {
-    return FormField(
-      onSaved: (newValue) => dateData = newValue,
-      initialValue: initialValueDate(),
-      validator: (value) {
-        if (value == null) {
-          return "Date must fill";
-        }
-        return null;
-      },
-      builder: (FormFieldState<DateTime> field) {
-        return SizedBox(
-          height: heightScreen * 0.065,
-          child: Column(
-            children: [
-              Expanded(
-                flex: 6,
-                child: Row(
-                  children: [
-                    const Expanded(flex: 1, child: Text("Date")),
-                    Expanded(
-                      flex: 2,
-                      child: GestureDetector(
-                        onTap: () async {
-                          DateTime val = field.value ?? DateTime.now();
-                          final newDate = await showDatePicker(
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(val.year + 10),
-                            context: context,
-                            initialDate: val,
-                          );
-                          if (newDate != null) {
-                            field.didChange(newDate);
-                          }
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          height: heightScreen * 0.045,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            // vertical: 8,
-                            horizontal: 12,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                field.value?.formatddMMyyyy() ?? "",
-                                style:
-                                    TextStyle(fontSize: heightScreen * 0.015),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 4,
-                child: field.hasError
-                    ? Row(
-                        children: [
-                          const Expanded(
-                            flex: 1,
-                            child: Text(""),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              child: Text(
-                                field.errorText ?? '',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: heightScreen * 0.014,
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      )
-                    : const SizedBox(),
-              )
-            ],
-          ),
-        );
-      },
-    );
   }
 
   Widget formDropdown(double heightScreen) {
@@ -339,145 +235,32 @@ class _AddScreenState extends State<AddScreen> {
     });
   }
 
-  Widget formType(double heightScreen) {
-    return FormField(
-        onSaved: (newValue) => type = newValue,
-        initialValue: initialValueType(),
-        validator: (value) {
-          if (value == null) {
-            return 'Please choose income / expense';
-          }
-          return null;
-        },
-        builder: (field) {
-          return SizedBox(
-            height: heightScreen * 0.065,
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 6,
-                  child: Row(
-                    children: [
-                      const Expanded(flex: 1, child: Text("")),
-                      Expanded(
-                        flex: 2,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: GestureDetector(
-                                onTap: () {
-                                  field.didChange('in');
-                                  setState(() {
-                                    isIncome = true;
-                                  });
-                                },
-                                child: Container(
-                                  height: heightScreen * 0.045,
-                                  decoration: BoxDecoration(
-                                    color: field.value == "in"
-                                        ? Colors.green[600]
-                                        : Colors.green[300],
-                                    // color: Colors.grey[200],
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(8),
-                                      bottomLeft: Radius.circular(8),
-                                    ),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Income",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: heightScreen * 0.015,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: GestureDetector(
-                                onTap: () {
-                                  field.didChange('out');
-                                  setState(() {
-                                    isIncome = false;
-                                  });
-                                },
-                                child: Container(
-                                  height: heightScreen * 0.045,
-                                  decoration: BoxDecoration(
-                                    color: field.value == "out"
-                                        ? Colors.red[600]
-                                        : Colors.red[200],
-                                    // color: Colors.grey[200],
-                                    borderRadius: const BorderRadius.only(
-                                      topRight: Radius.circular(8),
-                                      bottomRight: Radius.circular(8),
-                                    ),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Expense",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: heightScreen * 0.015,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: field.hasError
-                      ? Row(
-                          children: [
-                            const Expanded(
-                              flex: 1,
-                              child: Text(""),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
-                                child: Text(
-                                  field.errorText ?? '',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: heightScreen * 0.014,
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        )
-                      : const SizedBox(),
-                )
-              ],
+  Widget template(String text, double heightScreen, Widget child) {
+    return SizedBox(
+      height: heightScreen * 0.065,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Text(text),
             ),
-          );
-        });
+          ),
+          Expanded(
+            flex: 2,
+            child: child,
+          )
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final heightScreen = MediaQuery.of(context).size.height;
-    final widthScreen = MediaQuery.of(context).size.width;
+    final heightScreen = MediaQuery.sizeOf(context).height;
+    final widthScreen = MediaQuery.sizeOf(context).width;
     return BlocListener<DBBloc, DBState>(
       listener: (context, state) {
         if (state is DBStateInsertFailed) {
@@ -560,61 +343,47 @@ class _AddScreenState extends State<AddScreen> {
               key: formKey,
               child: Column(
                 children: [
-                  formDate(heightScreen),
-                  // const SizedBox(height: 20),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Expanded(
-                        flex: 1,
-                        child: Text("Amount"),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: heightScreen * 0.06,
-                          child: TextFormField(
-                            validator: (value) {
-                              double money = double.tryParse((value ?? "0")
-                                      .replaceAll(RegExp(r'[\,]'), '')) ??
-                                  0;
-                              if (money == 0) {
-                                return "Amount must not zero";
-                              }
-                              return null;
-                            },
-                            controller: moneyController,
-                            // autofocus: true,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              CurrencyInputFormatter(),
-                            ],
-                            maxLines: 1,
-                            textInputAction: TextInputAction.next,
-                            style: TextStyle(fontSize: heightScreen * 0.015),
-                            decoration: InputDecoration(
-                              constraints: BoxConstraints(
-                                  minHeight: heightScreen * 0.045),
-                              filled: true,
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 12,
-                              ),
-                              fillColor: Colors.grey[200],
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  template(
+                    'Date',
+                    heightScreen,
+                    FormDate(
+                      initialValueDate(),
+                      (newvalue) => dateData = newvalue,
+                    ),
                   ),
-                  const SizedBox(height: 20),
-                  formType(heightScreen),
+                  template(
+                    'Amount',
+                    heightScreen,
+                    FormMoney(
+                      initialValueMoney(),
+                      (newValue) {
+                        final value = newValue?.replaceAll(
+                                RegExp(r'[\,]+|(\.[0-9]+)'), '') ??
+                            '0';
+                        money = int.tryParse(value) ?? 0;
+                      },
+                    ),
+                  ),
+                  template(
+                    '',
+                    heightScreen,
+                    FormType(
+                      initialValueType(),
+                      (newValue) => type = newValue,
+                      event: (newValue) {
+                        if (newValue == 'in') {
+                          setState(() {
+                            isIncome = true;
+                          });
+                        } else if (newValue == 'out') {
+                          setState(() {
+                            isIncome = false;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+
                   formDropdown(heightScreen),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,

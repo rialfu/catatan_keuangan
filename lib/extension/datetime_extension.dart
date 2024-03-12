@@ -52,4 +52,8 @@ extension DateTimeExtend on DateTime {
   String yyyymmdd() {
     return DateFormat('yyyy-MM-dd').format(this);
   }
+
+  String dddotmm() {
+    return DateFormat('dd.MM').format(this);
+  }
 }

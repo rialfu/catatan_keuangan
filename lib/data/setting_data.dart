@@ -6,15 +6,23 @@ class SettingData extends Equatable {
   final bool isModeEdit;
   final Color foreground;
   final bool closeOverlay;
+  final double fontSizeNormal;
+  // final bool
   // final
-  const SettingData(this.isAsc, this.isModeEdit, this.foreground,
-      {this.closeOverlay = true});
+  const SettingData(
+    this.isAsc,
+    this.isModeEdit,
+    this.foreground, {
+    this.closeOverlay = true,
+    this.fontSizeNormal = 16,
+  });
 
   SettingData copyWith({
     bool? isAsc,
     bool? isModeEdit,
     Color? foreground,
     bool? closeOverlay,
+    double? fontSizeNormal,
   }) {
     // Colors.red
     return SettingData(
@@ -22,9 +30,10 @@ class SettingData extends Equatable {
       isModeEdit ?? this.isModeEdit,
       foreground ?? this.foreground,
       closeOverlay: closeOverlay ?? this.closeOverlay,
+      fontSizeNormal: fontSizeNormal ?? this.fontSizeNormal,
     );
   }
 
   @override
-  List<Object> get props => [isAsc, isModeEdit, closeOverlay];
+  List<Object> get props => [isAsc, isModeEdit, closeOverlay, fontSizeNormal];
 }

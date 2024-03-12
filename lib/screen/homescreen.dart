@@ -42,8 +42,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final widthScreen = MediaQuery.of(context).size.width;
-    final heightScreen = MediaQuery.of(context).size.height;
+    final widthScreen = MediaQuery.sizeOf(context).width;
+    final heightScreen = MediaQuery.sizeOf(context).height;
     print('home width:$widthScreen');
     final _ = widthScreen / heightScreen;
     return BlocBuilder<DBBloc, DBState>(builder: (context, state) {

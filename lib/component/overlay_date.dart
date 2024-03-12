@@ -42,7 +42,7 @@ class _OverlayDateChooseState extends State<OverlayDateChoose> {
 
   @override
   Widget build(BuildContext context) {
-    final widthScreen = MediaQuery.of(context).size.width;
+    final widthScreen = MediaQuery.sizeOf(context).width;
     return OverlayPortal(
       controller: widget.controller,
       overlayChildBuilder: (context) {
